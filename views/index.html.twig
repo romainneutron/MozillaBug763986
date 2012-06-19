@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Bugzilla 763986</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <h1>Mozilla bug #763986 reproduction</h1>
+      <p>
+          This page propose to reproduce bug <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=763986" target="_blank">#763986</a>
+          You will need the use of <a href="https://addons.mozilla.org/en-US/firefox/addon/live-http-headers/" target="_blank">Live HHTP Headers extension</a>
+      </p>
+
+      <p>
+          This bug is visible using Firefox 13. Chrome 19 works as expected.
+      </p>
+
+      <p>
+          The code used here is available on github : <a href="https://github.com/romainneutron/MozillaBug763986" target="_blank">https://github.com/romainneutron/MozillaBug763986</a>
+      </p>
+
+      <h2>How does it work ?</h2>
+      <p>
+          There are two buttons : the first one is called <strong>Renew etags</strong> and will add random drawing on the pictures. This will have as as consequence a change in the etags of images.
+          The second one is called <strong>Refresh dom</strong> and fetch dom with images from the server and replace it.
+      </p>
+
+      <p>
+          For each pictures presented below, corresponding etags are written between the title and the image.
+      </p>
+
+      <h2>What happens ?</h2>
+      <p>
+          Cache version of the image is still shown.<br/>
+          When pressing consecutively the <strong>Renew</strong> button and the <strong>Refresh</strong> button, you will see that etags are updated but the image are not refreshed. You will have to fully reload the page to see the change.
+      </p>
+
+      <h2>What should happen ?</h2>
+      <p>
+          Image should be updated.<br/>
+          As Etags are present in image headers, and no expiration/validate date is present, image should be revalidated everytime they're append to the dom.
+      </p>
+
+
+      <h2>Test Zone</h2>
+      <div class="row" style="margin:30px 0;">
+          <div class="span2">
+            <button id="etags-renewer">Renew etags</button>
+          </div>
+          <div class="span2">
+            <button id="dom-refresher">Refresh Dom</button>
+          </div>
+          <div class="span4">
+            <div id="notifications" style="color:red;"></div>
+          </div>
+      </div>
+
+
+      <div id="pictures">
+        {% include 'pictures.html.twig' %}
+      </div>
+    </div> <!-- /container -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#etags-renewer').bind('click', function(){
+                $.getJSON('/update-etags', {}, function(data){
+                    $('#notifications').stop().css({opacity:'100'});
+                    if(data.success) {
+                        $('#notifications').html('Images and Etags successfully renewed, now refresh it to see the result').show();
+                    } else {
+                        $('#notifications').html('Error while renewing images and etags').show();
+                    }
+
+                    $('#notifications').stop().animate({opacity:'0'}, 4000);
+                });
+
+                return false;
+            });
+
+
+            $('#dom-refresher').bind('click', function(){
+                $.get('/refresh-images', function(data){
+                    $('#pictures').empty().append(data);
+                });
+
+                return false;
+            });
+        });
+    </script>
+  </body>
+</html>

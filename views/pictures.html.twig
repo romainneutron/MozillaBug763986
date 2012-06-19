@@ -1,0 +1,13 @@
+<div class="row">
+    {% for name,data in datas %}
+    <div class="span4">
+        <h2>{{ name }}</h2>
+        <h3>{{ data['etag'] }}</h3>
+        <p>
+            <img src="/image/{{ name }}" style="width:100%" />
+        </p>
+    </div>
+    <div class="span1">
+    </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,13 @@
+{
+    "require": {
+        "php": ">=5.3.3",
+        "silex/silex": "1.0.*",
+        "twig/twig": "*",
+        "imagine/imagine": "dev-develop"
+    },
+    "autoload": {
+        "psr-0": {
+            "Neutron": "src"
+        }
+    }
+}
