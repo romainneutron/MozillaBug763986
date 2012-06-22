@@ -70,6 +70,8 @@ $app->get('/image/{image_id}', function($image_id, Application $app, Request $re
         $response = new Response();
         $response->setPrivate();
 
+	$response->setProtocolVersion('1.1');
+
         $response->setEtag($datas[$image_id]['etag']);
         $response->setLastModified($datas[$image_id]['last_modified']);
 
